@@ -1,0 +1,15 @@
+{
+  "name": "gestor-gastos-web",
+  "version": "1.0.0",
+  "description": "Sistema de gestão de gastos - Versão Web",
+  "main": "index.html",
+  "author": "Edson",
+  "scripts": {
+    "start": "npx http-server -c-1 -p 5173 ./public",
+    "dev": "npx http-server -c-1 -p 5173 ./public",
+    "icons": "node scripts/generate-icons.js"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

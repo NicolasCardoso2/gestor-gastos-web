@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestor de Gastos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="main-layout">
+    
+    <!-- =================(TABELA DE BOLETOS)================= -->
+    <div class="boletos-table-container">
+      <h2>Boletos do Dia</h2>
+      <div class="current-date-indicator" id="current-date-indicator"></div>
+      <table id="boletos-table" class="boletos-table">
+        <thead>
+          <tr><th>Nome</th><th>Valor</th></tr>
+        </thead>
+        <tbody><!-- Preenchido via JS --></tbody>
+        <tfoot>
+          <tr><td><strong>Total</strong></td><td id="boletos-total">R$ 0,00</td></tr>
+        </tfoot>
+      </table>
+
+      
+      <!-- =================(NAVEGAÇÃO)================= -->
+      <div class="navigation-bar">
+        <button id="nav-calendar" class="nav-tab active">Calendário</button>
+        <button id="nav-report" class="nav-tab">Relatório Mensal</button>
+      </div>
+    </div>
+
+    <!-- =================(TELA CALENDÁRIO)================= -->
+    <div id="calendar-screen" class="screen active">
+      <header class="calendar-header">
+        <button id="prev-month" class="btn nav-btn">◀</button>
+        <h1 id="calendar-title">Outubro 2025</h1>
+        <button id="next-month" class="btn nav-btn">▶</button>
+      </header>
+      <div class="weekdays">
+        <span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span>
+        <span>Sex</span><span>Sáb</span><span>Dom</span>
+      </div>
+      <main id="calendar" class="calendar"></main>
+    </div>
+
+    <!-- =================(TELA RELATÓRIO MENSAL)================= -->
+    <div id="report-screen" class="screen">
+      <header class="report-header">
+        <h2>Relatório Mensal</h2>
+        <div class="report-controls">
+          <select id="report-month">
+            <option value="0">Janeiro</option><option value="1">Fevereiro</option>
+            <option value="2">Março</option><option value="3">Abril</option>
+            <option value="4">Maio</option><option value="5">Junho</option>
+            <option value="6">Julho</option><option value="7">Agosto</option>
+            <option value="8">Setembro</option><option value="9">Outubro</option>
+            <option value="10">Novembro</option><option value="11">Dezembro</option>
+          </select>
+          <select id="report-year"></select>
+        </div>
+      </header>
+      <div class="report-content">
+        <div class="report-summary">
+          <div class="summary-item">
+            <span class="summary-label">Total do Mês:</span>
+            <span class="summary-value" id="total-month">R$ 0,00</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Média Diária:</span>
+            <span class="summary-value" id="average-daily">R$ 0,00</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Maior Gasto:</span>
+            <span class="summary-value" id="max-daily">R$ 0,00</span>
+          </div>
+        </div>
+        <div class="report-table-container">
+          <table id="monthly-table" class="monthly-table">
+            <thead>
+              <tr>
+                <th>Dia</th>
+                <th>Total Gasto</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="chart-container">
+          <h3>Gastos por Categoria</h3>
+          <canvas id="category-chart" width="400" height="300"></canvas>
+          <div id="chart-legend" class="chart-legend"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =================(TELA DETALHES)================= -->
+  <div id="details-screen" class="screen">
+    <header>
+      <button id="back-btn" class="back-btn">← Voltar</button>
+      <h2 id="selected-date"></h2>
+    </header>
+    <div class="details-content">
+      <form id="expense-form">
+        <label for="boleto-type">Boleto:</label>
+        <select id="boleto-type" required>
+          <option value="">Selecione...</option>
+          <option value="Água">Água</option><option value="Luz">Luz</option>
+          <option value="Internet">Internet</option><option value="Telefone">Telefone</option>
+          <option value="Imposto">Imposto</option><option value="Contadora">Contadora</option>
+          <option value="Outro">Outro</option>
+        </select>
+        <label for="boleto-due">Vencimento:</label>
+        <input type="date" id="boleto-due" required>
+        <label for="expense-value">Valor (R$):</label>
+        <input type="number" id="expense-value" required step="0.01">
+        <button type="submit" class="btn">Adicionar</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- =================(MODAL BOLETOS)================= -->
+  <div id="boletos-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span id="close-modal" class="close">&times;</span>
+      <h2 id="modal-date"></h2>
+      <div class="boletos-header">
+        <h3>Boletos cadastrados:</h3>
+        <div class="boletos-buttons">
+          <button id="add-boleto-btn" class="btn">Adicionar</button>
+          <button id="editar-boleto-btn" class="btn" disabled>Editar</button>
+          <button id="deletar-boleto-btn" class="btn btn-danger" disabled>Deletar</button>
+        </div>
+      </div>
+      <div class="boletos-list-block">
+        <div class="boletos-list-scroll">
+          <ul id="modal-boletos-list"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================(FORMULÁRIO MODAL)================= -->
+    <form id="add-boleto-form" style="display:none; margin-top:16px;">
+      <table class="boleto-form-table">
+        <tr>
+          <td><label for="modal-boleto-type">Tipo de boleto:</label></td>
+          <td>
+            <select id="modal-boleto-type" required>
+              <option value="">Selecione...</option>
+              <option value="Luz">Luz</option><option value="Água">Água</option>
+              <option value="Internet">Internet</option><option value="Telefone">Telefone</option>
+              <option value="Aluguel">Aluguel</option><option value="Cartão">Cartão</option>
+              <option value="Imposto">Imposto</option><option value="Contadora">Contadora</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td><label for="modal-boleto-nome">Nome do boleto:</label></td>
+          <td><input type="text" id="modal-boleto-nome" required></td>
+        </tr>
+        <tr>
+          <td><label for="modal-boleto-valor">Valor:</label></td>
+          <td><input type="number" id="modal-boleto-valor" required step="0.01"></td>
+        </tr>
+        <tr>
+          <td><label for="modal-boleto-obs">Observações:</label></td>
+          <td><input type="text" id="modal-boleto-obs"></td>
+        </tr>
+        <tr>
+          <td><label for="modal-boleto-repeticao">Repetição:</label></td>
+          <td>
+            <select id="modal-boleto-repeticao">
+              <option value="unica">Única vez</option>
+              <option value="mensal">Mensal</option>
+            </select>
+          </td>
+        </tr>
+        <tr id="row-boleto-meses" style="display:none;">
+          <td><label for="modal-boleto-meses">Mensal:</label></td>
+          <td>
+            <div class="mensal-aba">
+              <div class="mensal-input">
+                <input type="number" id="modal-boleto-meses" min="1" step="1" placeholder="Quantidade de meses" />
+                <span id="modal-boleto-meses-preview" class="mensal-preview"></span>
+              </div>
+              <small class="hint">Informe por quantos meses deve repetir (ex.: 6 meses).</small>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="save-btn-cell" colspan="2">
+            <button type="submit" class="btn" style="margin-top:12px;">Salvar boleto</button>
+            <button type="button" id="cancel-edit-btn" class="btn" style="margin-top:12px; display:none; background:#ccc;">Cancelar</button>
+          </td>
+        </tr>
+      </table>
+    </form>
+  </div>
+
+  <!-- =================(BOTÕES FLUTUANTES)================= -->
+  <div class="floating-buttons">
+    <button id="restart-btn" class="floating-btn restart-btn" title="Reiniciar Página">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/>
+      </svg>
+    </button>
+    <button id="settings-btn" class="floating-btn settings-btn" title="Configurações e Backup">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97c0-.33-.03-.66-.07-1l1.86-1.41c.2-.15.25-.42.13-.64l-1.86-3.23c-.12-.22-.39-.3-.61-.22l-2.14.91c-.5-.38-1.03-.7-1.62-.94L14.4 2.81c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41L9.25 5.35C8.66 5.59 8.12 5.92 7.63 6.29L5.49 5.38c-.22-.08-.49 0-.61.22L2.92 8.83c-.12.22-.07.49.13.64L4.91 11c-.04.33-.07.65-.07.97c0 .32.03.65.07.97l-1.86 1.41c-.2.15-.25.42-.13.64l1.86 3.23c.12.22.39.3.61.22l2.14-.91c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.14.91c.22.08.49 0 .61-.22l1.86-3.23c.12-.22.07-.49-.13-.64l-1.86-1.41z"/>
+      </svg>
+    </button>
+
+  </div>
+
+  <!-- =================(MODAL CONFIGURAÇÕES)================= -->
+  <div id="settings-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span id="close-settings-modal" class="close">&times;</span>
+      <h2>Configurações e Backup</h2>
+      
+      <div class="settings-section">
+        <h3>Gerenciar Dados</h3>
+        <div class="settings-buttons">
+          <button id="create-backup-btn" class="btn backup-btn">
+            Criar Backup
+          </button>
+          <button id="import-data-btn" class="btn import-btn">
+            Importar Dados
+          </button>
+          <button id="export-data-btn" class="btn export-btn">
+            Exportar Dados
+          </button>
+        </div>
+        <div class="backup-info">
+          <div class="info-line">
+            <strong>Dica:</strong> Faça backups regulares dos seus dados para não perdê-los!
+          </div>
+          <div class="info-line">
+            <strong>Local dos dados:</strong> Navegador (LocalStorage)
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>Informações</h3>
+        <div class="app-info">
+          <p><strong>Gestor de Gastos</strong> v1.0.0</p>
+          <p>Sistema de gestão financeira pessoal</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>
