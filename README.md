@@ -99,15 +99,7 @@ A aplicação é 100% estática. Faça upload dos arquivos da pasta `public/` pa
 
 ---
 
-## Banco de Dados
-
-O banco `database.db` é criado automaticamente em:
-
-```
-%APPDATA%/Gestor de Gastos
-```
-
-ArtArmazenamento de Dados
+## Armazenamento de Dados
 
 Os dados são salvos no **LocalStorage** do navegador automaticamente.
 
@@ -121,22 +113,30 @@ gestor-gastos-web/
 │   └── renderer.js   # Lógica JavaScript
 ├── scripts/          # Ferramentas de desenvolvimento
 ├── assets/           # Recursos
-└── package.js   | Função                            |
+└── package.json      # Configuração do projeto
+```
+
+---
+
+## Tecnologias Utilizadas
+
+| Tecnologia     | Função                            |
 | -------------- | --------------------------------- |
 | HTML5          | Estrutura da aplicação web        |
 | CSS3           | Estilos e responsividade          |
-| JavaScrição web** pura que funciona em qualquer navegador moderno
+| JavaScript ES6 | Lógica da aplicação               |
+| Chart.js       | Gráficos de pizza interativos     |
+| LocalStorage   | Armazenamento local dos dados     |
+| HTTP Server    | Servidor de desenvolvimento local |
+
+---
+
+## Observações
+
+- **Aplicação web** pura que funciona em qualquer navegador moderno
 - Projeto simples e leve para controle pessoal de gastos
 - Interface moderna e responsiva (PC e mobile)
 - Código vanilla JavaScript sem frameworks/dependências externas
 - Sistema completo de backup e recuperação de dados via JSON
 - Layout otimizado e acessível
 - Deploy fácil em qualquer servidor web estático
-
-- **Aplicativo desktop** exclusivo (não é versão web)
-- Projeto simples e leve para controle pessoal de gastos
-- Interface moderna com dropdowns arredondados e animações suaves
-- Ideal para estudo de integração entre Electron + SQLite
-- Código modular e fácil de adaptar para outras aplicações desktop
-- Sistema completo de backup e recuperação de dados
-- Layout otimizado sem botões desnecessários
